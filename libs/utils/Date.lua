@@ -198,6 +198,19 @@ function Date.parseTableUTC(tbl)
 end
 
 --[=[
+@m parseTimestampFormat
+@p str string
+@r number
+@r string
+@d Interprets a Discord timestamp format string `<t:seconds:style>`,
+returns Unix time in seconds and the style if one was present.
+]=]
+function Date.parseTimestampFormat(str)
+	local t, s = string.match(str, '<t:(%d+):?(%a?)>')
+	return tonumber(t), s
+end
+
+--[=[
 @m fromISO
 @t static
 @p str string
@@ -291,6 +304,17 @@ function Date.fromMicroseconds(us)
 end
 
 --[=[
+@m fromTimestampFormat
+@t static
+@p str string
+@r Date
+@d Constructs a new Date object from the Discord timestamp format `<t:seconds:style>`.
+]=]
+function Date.fromTimestampFormat(str)
+	return Date((Date.parseTimestampFormat(str)))
+end
+
+--[=[
 @m toISO
 @op sep string
 @op tz string
@@ -379,6 +403,20 @@ end
 ]=]
 function Date:toMicroseconds()
 	return self._s * US_PER_S + self._us
+end
+
+--[=[
+@m toTimestampFormat
+@op style string
+@r string
+@d Returns the date converted to the Discord timestamp format `<t:seconds:style>`.
+]=]
+function Date:toTimestampFormat(style)
+	if style then
+		return string.format('<t:%d:%s>', self:toSeconds(), style)
+	else
+		return string.format('<t:%d>', self:toSeconds())
+	end
 end
 
 --[=[
